@@ -1,0 +1,23 @@
+{
+  "bank": {
+    "revolut": {
+      "clientId": "",
+      "clientSecret": "",
+      "deviceId": ""
+    },
+    "nordea": {
+      "userId": "0000000",
+      "password": "0000",
+      "accountIdForCsv": 0,
+      "accountName": ""
+    },
+    "swedbank": {
+      "userId": "EE000000",
+      "socialSecurityId": "00000000000",
+      "accountNr": "000000000000"
+    }
+  },
+  "csvExport": {
+    "outDirectory": ""
+  }
+}

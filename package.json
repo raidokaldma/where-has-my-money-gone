@@ -1,0 +1,39 @@
+{
+  "name": "where-has-my-money-gone",
+  "version": "1.0.0",
+  "description": "Fetches account information from multiple banks and displays overview in console, also exports data to YNAB compatible CSV file.",
+  "scripts": {
+    "start": "node build/main-cli.js",
+    "clean": "rimraf ./build",
+    "build": "tsc",
+    "tslint": "tslint -c tslint.json 'src/**/*.ts'"
+  },
+  "author": "Raido Kaldma",
+  "license": "UNLICENSED",
+  "dependencies": {
+    "@types/command-line-args": "^4.0.2",
+    "@types/command-line-usage": "^5.0.0",
+    "cheerio": "^1.0.0-rc.2",
+    "cli-spinner": "^0.2.8",
+    "cli-table": "^0.3.1",
+    "colors": "^1.2.1",
+    "command-line-args": "^5.0.2",
+    "command-line-usage": "^5.0.4",
+    "csv-parse": "^2.2.0",
+    "csv-stringify": "^3.0.0",
+    "es6-promisify": "^6.0.0",
+    "html-entities": "^1.2.1",
+    "lodash": "^4.17.5",
+    "moment": "^2.22.1",
+    "request": "^2.85.0",
+    "request-promise-native": "^1.0.5",
+    "text-encoding": "^0.6.4"
+  },
+  "devDependencies": {
+    "@types/cheerio": "^0.22.7",
+    "@types/cli-spinner": "^0.2.0",
+    "rimraf": "^2.6.2",
+    "tslint": "^5.9.1",
+    "typescript": "^2.8.3"
+  }
+}
