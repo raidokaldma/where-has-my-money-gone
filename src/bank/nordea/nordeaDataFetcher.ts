@@ -97,13 +97,13 @@ export class NordeaDataFetcher {
     private async fetchCsv(csvFormUrl: string) {
         this.sendProgress("Fetching account statement CSV");
 
-        const startOfPreviousMonth = moment()
+        const startDate = moment()
             .subtract(1, "month")
-            .startOf("month")
             .format("DD.MM.YYYY");
 
+        // For some reason, Nordea uses future dates for some pending transactions, setting an end date in the future will capture those too
         const endDateInTheFuture = moment()
-            .add(1, "month")
+            .add(1, "week")
             .format("DD.MM.YYYY");
 
         const csvInBytes = await this.request.post(csvFormUrl, {
@@ -112,7 +112,7 @@ export class NordeaDataFetcher {
                 export: true,
                 accountId: this.config.get("bank.nordea.accountIdForCsv"),
                 layoutList: 4, // Format = CSV
-                startDate: startOfPreviousMonth,
+                startDate,
                 endDate: endDateInTheFuture,
             },
         });
