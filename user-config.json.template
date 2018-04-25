@@ -17,7 +17,20 @@
       "accountNr": "000000000000"
     }
   },
-  "csvExport": {
-    "outDirectory": ""
+  "exporter": {
+    "ynab": {
+      "csv": {
+        "outDirectory": ""
+      },
+      "api": {
+        "key": "",
+        "budgetId": "",
+        "account": {
+          "nordea": "",
+          "revolut": "",
+          "swedbank": ""
+        }
+      }
+    }
   }
 }

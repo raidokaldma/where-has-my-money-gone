@@ -25,7 +25,8 @@
     "moment": "^2.22.1",
     "request": "^2.85.0",
     "request-promise-native": "^1.0.5",
-    "text-encoding": "^0.6.4"
+    "text-encoding": "^0.6.4",
+    "ynab": "^0.15.0"
   },
   "devDependencies": {
     "@types/cheerio": "^0.22.7",

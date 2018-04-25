@@ -1,6 +1,7 @@
 import * as moment from "moment";
+import {withSpinner} from "../../common/promise-spinner";
 import {sleep} from "../../common/util";
-import {Bank, ProgressMessageCallback} from "../base/bank";
+import {Bank} from "../base/bank";
 import {Summary} from "../base/summary";
 import {TransactionRow} from "../base/transactionRow";
 
@@ -11,11 +12,9 @@ export class DummyBank extends Bank {
         return DummyBank.Name;
     }
 
-    public async fetchData(sendProgress: ProgressMessageCallback): Promise<void> {
-        sendProgress("Starting");
+    public async fetchData(): Promise<void> {
         for (let i = 1; i <= 5; i++) {
-            await sleep(500);
-            sendProgress(`Progress Step ${i}`);
+            await withSpinner(sleep(500), `Progress Step ${i}`);
         }
     }
 

@@ -1,9 +1,9 @@
 import {RequestAPI, RequiredUriUrl} from "request";
 import * as request from "request-promise-native";
 import {TextDecoder} from "text-encoding";
+import {withSpinner} from "../../common/promise-spinner";
 import {sleep} from "../../common/util";
 import {Config} from "../../config";
-import {ProgressMessageCallback} from "../base/bank";
 import {AuthResponse} from "./responseTypes";
 import {SwedbankTransactionData} from "./swedbankTransactionData";
 
@@ -11,12 +11,10 @@ const numberOfTransactionsToFetch = 30;
 
 export class SwedbankDataFetcher {
     private config: Config;
-    private sendProgress: ProgressMessageCallback;
     private request: RequestAPI<request.RequestPromise, request.RequestPromiseOptions, RequiredUriUrl>;
 
-    constructor(config: Config, progressCallback: ProgressMessageCallback) {
+    constructor(config: Config) {
         this.config = config;
-        this.sendProgress = progressCallback;
 
         this.request = request.defaults({
             baseUrl: "https://www.swedbank.ee",
@@ -30,9 +28,16 @@ export class SwedbankDataFetcher {
     }
 
     public async fetch(): Promise<SwedbankTransactionData> {
-        const {securityId, sessionId} = await this.logInWithSmartId();
-        const accountOverviewHtml = await this.fetchAccountOverviewHtml(sessionId, securityId);
-        const transactionsHtml = await this.fetchTransactionsHtml(sessionId, securityId);
+        const {securityId, sessionId} = await withSpinner(this.logInWithSmartId(), "Logging in with Smart-ID");
+
+        const accountOverviewHtml = await withSpinner(
+            this.fetchAccountOverviewHtml(sessionId, securityId),
+            "Fetching account overview",
+        );
+        const transactionsHtml = await withSpinner(
+            this.fetchTransactionsHtml(sessionId, securityId),
+            "Fetching transactions",
+        );
 
         return new SwedbankTransactionData(this.config).init(accountOverviewHtml, transactionsHtml);
     }
@@ -55,8 +60,6 @@ export class SwedbankDataFetcher {
             },
             json: true,
         });
-
-        this.sendProgress(responseJson.pollingStatus);
 
         return {securityId: responseJson.securityId, sessionId: responseJson.sessionId};
     }
@@ -91,13 +94,11 @@ export class SwedbankDataFetcher {
             json: true,
         });
 
-        this.sendProgress(responseJson.pollingStatus);
-
         const isLoggedIn = !!responseJson.customerName;
         return isLoggedIn;
     }
 
-    private fetchTransactionsHtml(sessionId: string, securityId: string): string {
+    private async fetchTransactionsHtml(sessionId: string, securityId: string): Promise<string> {
         return this.request.post(`/touch/overview/account;jsessionid=${sessionId}`, {
             form: {
                 securityId,
@@ -106,7 +107,7 @@ export class SwedbankDataFetcher {
         });
     }
 
-    private fetchAccountOverviewHtml(sessionId: string, securityId: string): string {
+    private async fetchAccountOverviewHtml(sessionId: string, securityId: string): Promise<string> {
         return this.request.post(`/touch/overview;jsessionid=${sessionId}`, {
             form: {
                 securityId,

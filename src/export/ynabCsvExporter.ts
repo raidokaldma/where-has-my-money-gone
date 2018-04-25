@@ -23,7 +23,7 @@ export class YnabCsvExporter implements IBankDataExporter {
         const csv = await this.toCsv(transactions);
 
         const fileName = `ynab-${bank.getName().toLowerCase()}.csv`;
-        const outputFileName = path.join(this.config.get("csvExport.outDirectory"), fileName);
+        const outputFileName = path.join(this.config.get("exporter.ynab.csv.outDirectory"), fileName);
 
         await asyncWriteFile(outputFileName, csv);
     }

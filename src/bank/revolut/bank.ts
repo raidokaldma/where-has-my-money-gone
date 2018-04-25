@@ -1,5 +1,5 @@
 import {Config} from "../../config";
-import {Bank, ProgressMessageCallback} from "../base/bank";
+import {Bank} from "../base/bank";
 import {Summary} from "../base/summary";
 import {TransactionRow} from "../base/transactionRow";
 import {RevolutDataFetcher} from "./revolutDataFetcher";
@@ -20,11 +20,9 @@ export class RevolutBank extends Bank {
         return RevolutBank.Name;
     }
 
-    public async fetchData(sendProgress: ProgressMessageCallback): Promise<void> {
-        sendProgress("Sending requests");
+    public async fetchData(): Promise<void> {
         const dataFetcher = new RevolutDataFetcher(this.config);
         this.transactionData = await dataFetcher.fetch();
-        sendProgress("Done");
     }
 
     public getTransactions(): TransactionRow[] {

@@ -1,5 +1,5 @@
 import {Config} from "../../config";
-import {Bank, ProgressMessageCallback} from "../base/bank";
+import {Bank} from "../base/bank";
 import {Summary} from "../base/summary";
 import {TransactionRow} from "../base/transactionRow";
 import {NordeaDataFetcher} from "./nordeaDataFetcher";
@@ -20,8 +20,8 @@ export class NordeaBank extends Bank {
         return NordeaBank.Name;
     }
 
-    public async fetchData(progressMessageCallback: ProgressMessageCallback): Promise<void> {
-        const dataFetcher = new NordeaDataFetcher(this.config, progressMessageCallback);
+    public async fetchData(): Promise<void> {
+        const dataFetcher = new NordeaDataFetcher(this.config);
         this.transactionData = await dataFetcher.fetch();
     }
 
