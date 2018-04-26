@@ -103,7 +103,7 @@ class ImportIdGenerator {
 }
 
 function toMilliUnits(amount) {
-    return amount * 1000;
+    return Math.round(amount * 1000);
 }
 
 function formatDate(date) {
