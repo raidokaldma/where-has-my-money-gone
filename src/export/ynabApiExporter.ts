@@ -6,6 +6,8 @@ import {withSpinner} from "../common/promise-spinner";
 import {Config} from "../config";
 import {IBankDataExporter} from "./baseDataExporter";
 
+const MAX_PAYEE_NAME_LENGTH = 50;
+
 export class YnabApiExporter implements IBankDataExporter {
     private config: Config;
     private ynabApi: ynab.api;
@@ -62,7 +64,7 @@ export class YnabApiExporter implements IBankDataExporter {
             const milliamount = toMilliUnits(transaction.getAmount());
             const isoDate = formatDate(transaction.getDate());
             const description = toLimitedMemo(transaction.getDescription());
-            const name = transaction.getPayerOrPayee();
+            const name = (transaction.getPayerOrPayee() || "").trim().substring(0, MAX_PAYEE_NAME_LENGTH);
 
             const ynabTransaction: ynab.SaveTransaction = {
                 import_id: importId,
