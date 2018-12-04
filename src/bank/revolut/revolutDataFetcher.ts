@@ -31,7 +31,7 @@ export class RevolutDataFetcher {
         const fromDate = moment().subtract(1, "month").toDate();
 
         const transactionsResponse = await withSpinner(
-            this.request.get(`/user/current/transactions?from=${fromDate.valueOf()}`) as Promise<ITransaction[]>,
+            this.request.get(`/user/current/transactions?count=500&from=${fromDate.valueOf()}`) as Promise<ITransaction[]>,
             "Fetching transactions",
         );
 
