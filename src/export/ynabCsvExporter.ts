@@ -8,7 +8,7 @@ import {TransactionRow} from "../bank/base/transactionRow";
 import {Config} from "../config";
 import {IBankDataExporter} from "./baseDataExporter";
 
-const asyncCsvStringify: (input: Array<{}>, opts: csvStringify.StringifyOpts) => Promise<any> = promisify(csvStringify);
+const asyncCsvStringify: (input: Array<{}>, opts: csvStringify.Options) => Promise<any> = promisify(csvStringify);
 const asyncWriteFile: (path: fs.PathLike, data: any) => Promise<any> = promisify(fs.writeFile);
 
 export class YnabCsvExporter implements IBankDataExporter {
