@@ -43,7 +43,7 @@ const commandLineUsageSections = [
         await executeWith(bankNames);
     }
 })().catch((error) => {
-    console.error(`😱 Uh-oh, something broke.\n`, error);
+    console.error(`😱 Uh-oh, something broke.\n`, error.message);
 });
 
 function showCommandLineUsage() {
