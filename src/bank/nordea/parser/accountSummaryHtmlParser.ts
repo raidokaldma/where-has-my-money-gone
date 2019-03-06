@@ -12,7 +12,7 @@ export function getAccountSummaryFromHtml(config: Config, accountSummaryHtml): S
         .filter((index, element) => $(element).text().includes(accountName));
 
     if (tr.length !== 1) {
-        throw new Error(`😱 Could not find account with name "${accountName}"`);
+        throw new Error(`Could not find account with name "${accountName}"`);
     }
 
     // Columns per row:

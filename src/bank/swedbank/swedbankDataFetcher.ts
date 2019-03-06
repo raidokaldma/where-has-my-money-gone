@@ -70,7 +70,7 @@ export class SwedbankDataFetcher {
         for (let i = 1; i <= maxTries; i++) {
             // It seems response does not reveal if Smart-ID login attempt was cancelled. This is a workaround.
             if (i === maxTries) {
-                throw new Error(`😱 Could not log in with Smart-ID"`);
+                throw new Error("Could not log in with Smart-ID");
             }
 
             await sleep(3000);

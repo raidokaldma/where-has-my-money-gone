@@ -66,7 +66,13 @@ export class NordeaDataFetcher {
         const loginStep2Xml = await withSpinner(responsePromise, "Login step 2, sending password");
 
         const $ = cheerio.load(loginStep2Xml);
-        return $("path").text();
+        const path = $("path").text();
+
+        if (path.match(urlHelpers.passwordChangePageUrlRegex)) {
+            throw new Error("Password has expired. Use browser to log in and update the password.");
+        }
+
+        return path;
     }
 
     private async fetchMainPage(welcomeUrl: string) {
@@ -118,6 +124,7 @@ const urlHelpers = {
     csValueRegex: /loginConfig\.urlGetUserId = '.+;cs=(.+)';/,
     getLoginStep1Url: (cs) => `/pnb/login1.do?ts=EE&act=id&ajax=true&cs=${cs}`,
     getLoginStep2Url: (cs) => `/pnb/login2.do?act=auth&ajax=true&cs=${cs}`,
+    passwordChangePageUrlRegex: "/pnb/ll_pass_chg_login.do",
     accountSummaryUrlRegex: /"([/]pnb[/]acnt.do[?]ms=true.+?)"/,
     reservationsPageUrlRegex: /"([/]pnb[/]acnt.do[?]act=hld.+?)"/,
     accountStatementUrlRegex: /"([/]pnb[/]acnt.do[?]act=sr.+?)"/,
