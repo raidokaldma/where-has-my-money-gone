@@ -35,7 +35,7 @@ export class RevolutTransactionData {
 
         return transactions.map((t: ITransaction) => {
             const date = new Date(t.startedDate);
-            const amount = t.amount / 100.0;
+            const amount = (t.amount - t.fee) / 100.0;
 
             const payerOrPayee = getPayerOrPayee(t);
             const comment = getDescription(t);
