@@ -5,7 +5,6 @@ import {Swedbank} from "./bank/swedbank/bank";
 import {Config} from "./config";
 import {ConsoleExporter} from "./export/consoleExporter";
 import {YnabApiExporter} from "./export/ynabApiExporter";
-import {YnabCsvExporter} from "./export/ynabCsvExporter";
 
 const config = new Config();
 const banks = new Map()
@@ -16,7 +15,6 @@ const banks = new Map()
 
 const bankDataExporters = [
     new ConsoleExporter(),
-    new YnabCsvExporter(config),
     new YnabApiExporter(config),
 ];
 
