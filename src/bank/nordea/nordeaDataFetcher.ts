@@ -4,6 +4,7 @@ import {RequestAPI, RequiredUriUrl} from "request";
 import * as request from "request-promise-native";
 import {TextDecoder} from "text-encoding";
 import {withSpinner} from "../../common/promise-spinner";
+import {sleep} from "../../common/util";
 import {Config} from "../../config";
 import {NordeaTransactionData} from "./nordeaTransactionData";
 
@@ -16,15 +17,15 @@ export class NordeaDataFetcher {
 
         this.request = request.defaults({
             baseUrl: "https://netbank.nordea.com",
+            followAllRedirects: true,
             jar: request.jar(),
         });
     }
 
     public async fetch(): Promise<NordeaTransactionData> {
-        const mainPageUrl = await this.logIn();
-        const mainPageHtml = await withSpinner(this.fetchMainPage(mainPageUrl), "Logged in, opening main page");
+        const welcomePage = await this.logIn();
 
-        const accountSummaryUrl = findOnPage(urlHelpers.accountSummaryUrlRegex, mainPageHtml);
+        const accountSummaryUrl = findOnPage(urlHelpers.accountSummaryUrlRegex, welcomePage);
         const accountSummaryHtml = await withSpinner(this.fetchAccountSummaryPage(accountSummaryUrl), "Opening account summary page");
 
         const reservationsUrl = findOnPage(urlHelpers.reservationsPageUrlRegex, accountSummaryHtml);
@@ -43,40 +44,50 @@ export class NordeaDataFetcher {
         const loginPageHtml = await withSpinner(this.request.get(urlHelpers.loginPageUrl), "Opening login page");
         const cs = findOnPage(urlHelpers.csValueRegex, loginPageHtml);
 
-        const loginStep1Url = urlHelpers.getLoginStep1Url(cs);
-        await withSpinner(this.request.post(loginStep1Url, {
-            form: {
-                userId: this.config.get("bank.nordea.userId"),
-            },
-        }), "Login step 1, sending username");
+        // Page contains: <input type="hidden" name="org.apache.struts.taglib.html.TOKEN" value="ae762ddd1aa107554a75a64581dcc818">
+        const strutsCsrfToken = findOnPage(urlHelpers.strutsCsrfTokenRegex, loginPageHtml);
 
-        const loginStep2Url = urlHelpers.getLoginStep2Url(cs);
-        const responsePromise: Promise<string> = this.request.post(loginStep2Url, {
+        // Response: <?xml version="1.0" encoding="UTF-8"?><response status="ok"><login><authType>MOBILE_ID</authType><authCodeText>Code no.</authCodeText><gtDevice></gtDevice><authDeviceName>MOBILE_ID</authDeviceName></login><messages></messages></response>
+        await withSpinner(this.request.get(urlHelpers.switchToMobileIdAuthentication(cs)), "Changing authentication to Mobile-ID");
+
+        // Response: <ajax><status>ok</status><message>1695</message></ajax>
+        await withSpinner(this.request.get(urlHelpers.startMobileIdLogin(this.config.get("bank.nordea.userId"))), "Authenticating with Mobile-ID");
+
+        const mobileIdHash = await withSpinner(this.pollStatusUntilLoggedIn(), "Waiting for response from phone");
+
+        const welcomePagePromise = this.request.post(urlHelpers.finishMobileIdLogin(cs), {
             form: {
-                authCode: this.config.get("bank.nordea.password"),
+                "org.apache.struts.taglib.html.TOKEN": strutsCsrfToken,
+                "userId": this.config.get("bank.nordea.userId"),
+                "mobileIdHash": mobileIdHash,
             },
         });
-        // <?xml version="1.0" encoding="UTF-8"?>
-        // <response status="ok">
-        //     <login>
-        //         <path>/pnb/Welcome.do?userts=ee&amp;cs=123456</path>
-        //     </login>
-        //     <messages>...</messages>
-        // </response>
-        const loginStep2Xml = await withSpinner(responsePromise, "Login step 2, sending password");
+        const welcomePageHtml = await withSpinner(welcomePagePromise, "Logging in and waiting for redirect to welcome page");
 
-        const $ = cheerio.load(loginStep2Xml);
-        const path = $("path").text();
-
-        if (path.match(urlHelpers.passwordChangePageUrlRegex)) {
-            throw new Error("Password has expired. Use browser to log in and update the password.");
-        }
-
-        return path;
+        return welcomePageHtml;
     }
 
-    private async fetchMainPage(welcomeUrl: string) {
-        return this.request.get(welcomeUrl);
+    private async pollStatusUntilLoggedIn(): Promise<string> {
+        const maxTries = 10;
+
+        for (let i = 1; i <= maxTries; i++) {
+            await sleep(3000);
+
+            const mobileHash = await this.getMobileIdHash();
+
+            if (mobileHash) {
+                return mobileHash;
+            }
+        }
+    }
+
+    private async getMobileIdHash(): Promise<string | null> {
+        // <ajax><status>ok</status><authenticated>no</authenticated></ajax>
+        // <ajax><status>ok</status><authenticated>ok</authenticated><mobileHash>t+gWEYR707V1c5/k0bXHYXBE4ZKvkl/u1Qy5gFGtI74=</mobileHash></ajax>
+        const statusXML = await this.request.get(urlHelpers.checkMobileIdLoginStatus());
+
+        const mobileHash = cheerio.load(statusXML)("mobileHash").text();
+        return mobileHash;
     }
 
     private async fetchAccountSummaryPage(accountSummaryUrl: any) {
@@ -122,8 +133,11 @@ function findOnPage(regex, page) {
 const urlHelpers = {
     loginPageUrl: "/pnb/login.do?ts=EE&language=en",
     csValueRegex: /loginConfig\.urlGetUserId = '.+;cs=(.+)';/,
-    getLoginStep1Url: (cs) => `/pnb/login1.do?ts=EE&act=id&ajax=true&cs=${cs}`,
-    getLoginStep2Url: (cs) => `/pnb/login2.do?act=auth&ajax=true&cs=${cs}`,
+    strutsCsrfTokenRegex: /name=".+"\s+value="(.+)"/,
+    switchToMobileIdAuthentication: (cs) => `/pnb/login.do?act=chg_auth&auth=MOBILE_ID&ajax=true&cs=${cs}`,
+    startMobileIdLogin: (userId) => `/pnb/mobile_id_action.do?type=login&act=sendRequest&id=${userId}&time=${Date.now()}`,
+    checkMobileIdLoginStatus: () => `/pnb/mobile_id_action.do?type=login&act=getStatus&time=${Date.now()}`,
+    finishMobileIdLogin: (cs) => `/pnb/login1.do?act=initializeMobileId&cs=${cs}`,
     passwordChangePageUrlRegex: "/pnb/ll_pass_chg_login.do",
     accountSummaryUrlRegex: /"([/]pnb[/]acnt.do[?]ms=true.+?)"/,
     reservationsPageUrlRegex: /"([/]pnb[/]acnt.do[?]act=hld.+?)"/,

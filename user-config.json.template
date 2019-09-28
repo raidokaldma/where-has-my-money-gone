@@ -7,7 +7,6 @@
     },
     "nordea": {
       "userId": "0000000",
-      "password": "0000",
       "accountIdForCsv": 0,
       "accountName": ""
     },
