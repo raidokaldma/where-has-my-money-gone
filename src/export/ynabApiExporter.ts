@@ -36,6 +36,7 @@ export class YnabApiExporter implements IBankDataExporter {
 
         if (bankAmount === ynabAmount) {
             console.log("✅ YNAB is up to date");
+            console.log();
             return;
         }
 
@@ -47,6 +48,7 @@ export class YnabApiExporter implements IBankDataExporter {
         );
 
         console.log(`✅ Done. Added ${updateCount} new transactions.`);
+        console.log();
     }
 
     private async getYnabAccountBalance(accountId: string) {
