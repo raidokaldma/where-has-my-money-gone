@@ -17,7 +17,7 @@
     "colors": "^1.2.1",
     "command-line-args": "^5.0.2",
     "command-line-usage": "^5.0.4",
-    "csv-parse": "^2.2.0",
+    "csv-parse": "^4.4.6",
     "csv-stringify": "^3.0.0",
     "es6-promisify": "^6.0.0",
     "html-entities": "^1.2.1",
