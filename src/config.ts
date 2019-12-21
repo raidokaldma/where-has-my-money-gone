@@ -1,7 +1,7 @@
 import * as _ from "lodash";
 
 export class Config {
-    private config: string;
+    private readonly config: string;
 
     constructor(configJson = readConfigFromFile()) {
         this.config = configJson;

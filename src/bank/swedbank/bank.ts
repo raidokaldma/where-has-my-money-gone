@@ -2,18 +2,15 @@ import {Config} from "../../config";
 import {Bank} from "../base/bank";
 import {Summary} from "../base/summary";
 import {TransactionRow} from "../base/transactionRow";
-import {SwedbankDataFetcher} from "./swedbankDataFetcher";
-import {SwedbankTransactionData} from "./swedbankTransactionData";
+import {fetchTransactionsAndSummary} from "./swedbankDataFetcher";
 
-export class Swedbank extends Bank {
+export class Swedbank implements Bank {
     public static Name = "Swedbank";
 
-    private config: Config;
-    private transactionData: SwedbankTransactionData;
+    private summary: Summary;
+    private transactions: TransactionRow[];
 
-    constructor(config) {
-        super();
-        this.config = config;
+    constructor(private config: Config) {
     }
 
     public getName(): string {
@@ -21,15 +18,16 @@ export class Swedbank extends Bank {
     }
 
     public async fetchData(): Promise<void> {
-        const dataFetcher = new SwedbankDataFetcher(this.config);
-        this.transactionData = await dataFetcher.fetch();
+        const {summary, transactions} = await fetchTransactionsAndSummary(this.config);
+        this.summary = summary;
+        this.transactions = transactions;
     }
 
     public getTransactions(): TransactionRow[] {
-        return this.transactionData.getTransactions();
+        return this.transactions;
     }
 
     public getSummary(): Summary {
-        return this.transactionData.getSummary();
+        return this.summary;
     }
 }

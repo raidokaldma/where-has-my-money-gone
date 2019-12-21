@@ -3,14 +3,10 @@ import {TransactionRow} from "../base/transactionRow";
 import {ITransaction, IWallet} from "./responseTypes";
 
 export class RevolutTransactionData {
-    private transactionsResponse: ITransaction[];
-    private walletResponse: IWallet;
     private transactions: TransactionRow[];
     private summary: Summary;
 
-    constructor(transactionsResponse: ITransaction[], walletResponse: IWallet) {
-        this.transactionsResponse = transactionsResponse;
-        this.walletResponse = walletResponse;
+    constructor(private transactionsResponse: ITransaction[], private walletResponse: IWallet) {
     }
 
     public async init(): Promise<RevolutTransactionData> {

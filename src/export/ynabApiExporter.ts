@@ -11,7 +11,7 @@ const MAX_PAYEE_NAME_LENGTH = 50;
 export class YnabApiExporter implements IBankDataExporter {
     private config: Config;
     private ynabApi: ynab.api;
-    private budgetId: string;
+    private readonly budgetId: string;
 
     constructor(config: Config) {
         this.config = config;
@@ -76,7 +76,7 @@ export class YnabApiExporter implements IBankDataExporter {
                 payee_name: name,
                 memo: description,
                 cleared: ynab.SaveTransaction.ClearedEnum.Cleared,
-                flag_color: ynab.SaveTransaction.FlagColorEnum.Purple,
+                flag_color: ynab.SaveTransaction.FlagColorEnum.Orange,
             };
             return ynabTransaction;
         });

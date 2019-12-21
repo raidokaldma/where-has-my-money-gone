@@ -6,12 +6,10 @@ import {getAccountSummaryFromHtml} from "./parser/accountSummaryHtmlParser";
 import {getReservedTransactionsFromHtml} from "./parser/reservedTransactionsHtmlParser";
 
 export class NordeaTransactionData {
-    private config: Config;
     private transactions: TransactionRow[];
     private summary: Summary;
 
-    constructor(config: Config) {
-        this.config = config;
+    constructor(private config: Config) {
     }
 
     public async init(accountSummaryHtml: string, accountStatementCsv: string, reservationsHtml: string) {

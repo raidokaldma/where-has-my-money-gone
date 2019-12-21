@@ -9,12 +9,9 @@ import {Config} from "../../config";
 import {NordeaTransactionData} from "./nordeaTransactionData";
 
 export class NordeaDataFetcher {
-    private config: Config;
     private request: RequestAPI<request.RequestPromise, request.RequestPromiseOptions, RequiredUriUrl>;
 
-    constructor(config: Config) {
-        this.config = config;
-
+    constructor(private config: Config) {
         this.request = request.defaults({
             baseUrl: "https://netbank.nordea.com",
             followAllRedirects: true,

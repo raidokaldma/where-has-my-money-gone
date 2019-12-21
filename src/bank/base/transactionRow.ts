@@ -1,16 +1,9 @@
 export class TransactionRow {
-    private date: Date;
-    private amount: number;
-    private payerOrPayee: string;
-    private description: string;
-    private completed: boolean;
-
-    constructor(date, amount, payerOrPayee, description, completed = true) {
-        this.date = date;
-        this.amount = amount;
-        this.payerOrPayee = payerOrPayee;
-        this.description = description;
-        this.completed = completed;
+    constructor(private date: Date,
+                private amount: number,
+                private payerOrPayee: string,
+                private description: string,
+                private completed: boolean = true) {
     }
 
     public getDate() {

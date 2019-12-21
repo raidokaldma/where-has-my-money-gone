@@ -7,11 +7,9 @@ import {ITransaction, IWallet} from "./responseTypes";
 import {RevolutTransactionData} from "./revolutTransactionData";
 
 export class RevolutDataFetcher {
-    private config: Config;
     private request: RequestAPI<request.RequestPromise, request.RequestPromiseOptions, RequiredUriUrl>;
 
-    constructor(config: Config) {
-        this.config = config;
+    constructor(private config: Config) {
         this.request = request.defaults({
             baseUrl: "https://api.revolut.com",
             auth: {

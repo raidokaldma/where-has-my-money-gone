@@ -5,15 +5,12 @@ import {TransactionRow} from "../base/transactionRow";
 import {RevolutDataFetcher} from "./revolutDataFetcher";
 import {RevolutTransactionData} from "./revolutTransactionData";
 
-export class RevolutBank extends Bank {
+export class RevolutBank implements Bank {
     public static Name = "Revolut";
 
-    private config: Config;
     private transactionData: RevolutTransactionData;
 
-    constructor(config: Config) {
-        super();
-        this.config = config;
+    constructor(private config: Config) {
     }
 
     public getName(): string {

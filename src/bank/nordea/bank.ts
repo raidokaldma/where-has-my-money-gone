@@ -5,15 +5,12 @@ import {TransactionRow} from "../base/transactionRow";
 import {NordeaDataFetcher} from "./nordeaDataFetcher";
 import {NordeaTransactionData} from "./nordeaTransactionData";
 
-export class NordeaBank extends Bank {
+export class NordeaBank implements Bank {
     public static Name = "Nordea";
 
-    private config: Config;
     private transactionData: NordeaTransactionData;
 
-    constructor(config) {
-        super();
-        this.config = config;
+    constructor(private config: Config) {
     }
 
     public getName(): string {

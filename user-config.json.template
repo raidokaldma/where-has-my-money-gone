@@ -12,8 +12,7 @@
     },
     "swedbank": {
       "userId": "EE000000",
-      "socialSecurityId": "00000000000",
-      "accountNr": "000000000000"
+      "socialSecurityId": "00000000000"
     }
   },
   "exporter": {

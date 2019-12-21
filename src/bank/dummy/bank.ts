@@ -5,7 +5,7 @@ import {Bank} from "../base/bank";
 import {Summary} from "../base/summary";
 import {TransactionRow} from "../base/transactionRow";
 
-export class DummyBank extends Bank {
+export class DummyBank implements Bank {
     public static Name = "Dummy";
 
     public getName(): string {
