@@ -1,5 +1,5 @@
 import * as moment from "moment";
-import * as ynab from "ynab";
+import {Account, api as YnabApi, BulkResponse, ErrorResponse, SaveTransaction, utils} from "ynab";
 import {Bank} from "../bank/base/bank";
 import {TransactionRow} from "../bank/base/transactionRow";
 import {withSpinner} from "../common/promise-spinner";
@@ -10,12 +10,12 @@ const MAX_PAYEE_NAME_LENGTH = 50;
 
 export class YnabApiExporter implements IBankDataExporter {
     private config: Config;
-    private ynabApi: ynab.api;
+    private ynabApi: YnabApi;
     private readonly budgetId: string;
 
     constructor(config: Config) {
         this.config = config;
-        this.ynabApi = new ynab.api(this.config.get("exporter.ynab.api.key"));
+        this.ynabApi = new YnabApi(this.config.get("exporter.ynab.api.key"));
         this.budgetId = this.config.get("exporter.ynab.api.budgetId");
     }
 
@@ -53,8 +53,8 @@ export class YnabApiExporter implements IBankDataExporter {
 
     private async getYnabAccountBalance(accountId: string) {
         const accountResponse = await this.ynabApi.accounts.getAccountById(this.budgetId, accountId);
-        const account: ynab.Account = accountResponse.data.account;
-        const ynabAmount = ynab.utils.convertMilliUnitsToCurrencyAmount(account.balance);
+        const account: Account = accountResponse.data.account;
+        const ynabAmount = utils.convertMilliUnitsToCurrencyAmount(account.balance);
         return ynabAmount;
     }
 
@@ -64,19 +64,22 @@ export class YnabApiExporter implements IBankDataExporter {
         return transactions.map((transaction: TransactionRow) => {
             const importId = importIdGenerator.generateId(transaction.getDate(), transaction.getAmount());
             const milliamount = toMilliUnits(transaction.getAmount());
-            const isoDate = formatDate(transaction.getDate());
+
+            // Some banks might provide future dates for pending transactions, but YNAB API does not accept future dates.
+            const isoDate = formatDate(transaction.getDate() < new Date() ? transaction.getDate() : new Date());
+
             const description = toLimitedMemo(transaction.getDescription());
             const name = (transaction.getPayerOrPayee() || "").trim().substring(0, MAX_PAYEE_NAME_LENGTH);
 
-            const ynabTransaction: ynab.SaveTransaction = {
+            const ynabTransaction: SaveTransaction = {
                 import_id: importId,
                 account_id: accountId,
                 date: isoDate,
                 amount: milliamount,
                 payee_name: name,
                 memo: description,
-                cleared: ynab.SaveTransaction.ClearedEnum.Cleared,
-                flag_color: ynab.SaveTransaction.FlagColorEnum.Orange,
+                cleared: SaveTransaction.ClearedEnum.Cleared,
+                flag_color: SaveTransaction.FlagColorEnum.Orange,
             };
             return ynabTransaction;
         });
@@ -84,9 +87,14 @@ export class YnabApiExporter implements IBankDataExporter {
 
     private async bulkCreateYnabTransactions(accountId: string, transactions: TransactionRow[]) {
         const ynabTransactions = this.toYnabTransactions(transactions, accountId);
-        const response: ynab.BulkResponse = await this.ynabApi.transactions.bulkCreateTransactions(this.budgetId, {transactions: ynabTransactions});
-        const updateCount = response.data.bulk.transaction_ids.length;
-        return updateCount;
+
+        try {
+            const response: BulkResponse = await this.ynabApi.transactions.bulkCreateTransactions(this.budgetId, {transactions: ynabTransactions});
+            const updateCount = response.data.bulk.transaction_ids.length;
+            return updateCount;
+        } catch (error) {
+            throw new Error((error as ErrorResponse).error.detail);
+        }
     }
 }
 
