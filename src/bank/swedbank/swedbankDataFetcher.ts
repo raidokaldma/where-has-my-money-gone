@@ -69,7 +69,8 @@ async function fetchAccountOverview(page: Page): Promise<Summary> {
     const {bookedAmount, availableAmount} = await page.$eval("#accounts-balance tbody tr", (firstTr) => {
         const bookedAmount: string = firstTr.querySelector('td[data-th="Broneeritud"]').innerText;
         const availableAmount: string = firstTr.querySelector('td[data-th="Vaba jääk"]').innerText
-            .replace("EUR", ""); // 123.45EUR -> 123.45
+            .replace(/\s+/, "") // 1 234.56EUR -> 1234.56EUR
+            .replace("EUR", ""); // 1234.56EUR -> 1234.56
 
         return {bookedAmount, availableAmount};
     }) as any;
