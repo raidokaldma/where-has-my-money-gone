@@ -1,27 +1,24 @@
+import got, {Got} from "got";
 import * as moment from "moment";
-import {RequestAPI, RequiredUriUrl} from "request";
-import * as request from "request-promise-native";
 import {withSpinner} from "../../common/promise-spinner";
 import {Config} from "../../config";
 import {ITransaction, IWallet} from "./responseTypes";
 import {RevolutTransactionData} from "./revolutTransactionData";
 
 export class RevolutDataFetcher {
-    private request: RequestAPI<request.RequestPromise, request.RequestPromiseOptions, RequiredUriUrl>;
+    private got: Got;
 
     constructor(private config: Config) {
-        this.request = request.defaults({
-            baseUrl: "https://api.revolut.com",
-            auth: {
-                pass: this.config.get("bank.revolut.clientSecret"),
-                user: this.config.get("bank.revolut.clientId"),
-            },
+        this.got = got.extend({
+            prefixUrl: "https://api.revolut.com",
+            username: this.config.get("bank.revolut.clientId"),
+            password: this.config.get("bank.revolut.clientSecret"),
             headers: {
                 "User-Agent": "",
                 "X-Api-Version": "1",
                 "X-Device-Id": this.config.get("bank.revolut.deviceId"),
             },
-            json: true,
+            responseType: "json",
         });
     }
 
@@ -29,12 +26,12 @@ export class RevolutDataFetcher {
         const fromDate = moment().subtract(1, "month").toDate();
 
         const transactionsResponse = await withSpinner(
-            this.request.get(`/user/current/transactions?count=500&from=${fromDate.valueOf()}`) as Promise<ITransaction[]>,
+            this.got.get(`user/current/transactions?count=500&from=${fromDate.valueOf()}`).json<ITransaction[]>(),
             "Fetching transactions",
         );
 
         const walletResponse = await withSpinner(
-            this.request.get(`/user/current/wallet`) as Promise<IWallet>,
+            this.got.get(`user/current/wallet`).json<IWallet>(),
             "Fetching balance",
         );
 
