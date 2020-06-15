@@ -1,5 +1,5 @@
+import * as chalk from "chalk";
 import * as Table from "cli-table";
-import * as colors from "colors";
 import * as moment from "moment";
 import {Bank} from "../bank/base/bank";
 import {Summary} from "../bank/base/summary";
@@ -34,8 +34,8 @@ export class ConsoleExporter implements IBankDataExporter {
             const amount = transactionRow.getAmount();
 
             let formattedAmount = amount.toFixed(2);
-            formattedAmount = amount < 0 ? colors.red(formattedAmount) : colors.green(formattedAmount);
-            formattedAmount = transactionRow.isCompleted() ? formattedAmount : colors.dim(formattedAmount);
+            formattedAmount = amount < 0 ? chalk.red(formattedAmount) : chalk.green(formattedAmount);
+            formattedAmount = transactionRow.isCompleted() ? formattedAmount : chalk.dim(formattedAmount);
 
             return [
                 moment(transactionRow.getDate()).format("YYYY.MM.DD ddd"),
@@ -65,7 +65,7 @@ export class ConsoleExporter implements IBankDataExporter {
             },
         });
 
-        summaryTable.push({"Pending Amount": summary.getPendingAmount().toFixed(2)});
+        summaryTable.push({"Pending Amount": chalk.dim(summary.getPendingAmount().toFixed(2))});
         summaryTable.push({"Available Amount": summary.getAvailableAmount().toFixed(2)});
 
         console.log(summaryTable.toString());
