@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "Fetches account information from multiple banks and displays overview in console, also exports data to YNAB compatible CSV file.",
   "scripts": {
-    "start": "node build/main-cli.js",
+    "start": "ts-node src/main-cli.ts",
     "clean": "rimraf ./build",
     "compile": "tsc",
     "tslint": "tslint -c tslint.json 'src/**/*.ts'"
@@ -11,6 +11,7 @@
   "author": "Raido Kaldma",
   "license": "UNLICENSED",
   "dependencies": {
+    "chalk": "^4.1.0",
     "cheerio": "^1.0.0-rc.2",
     "cli-spinner": "^0.2.8",
     "cli-table": "^0.3.1",
@@ -36,6 +37,7 @@
     "@types/command-line-usage": "^5.0.0",
     "@types/puppeteer": "^2.0.0",
     "rimraf": "^2.6.2",
+    "ts-node": "^8.6.2",
     "tslint": "^5.20.1",
     "typescript": "^3.7.4"
   }
