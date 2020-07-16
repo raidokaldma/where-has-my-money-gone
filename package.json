@@ -22,7 +22,7 @@
     "es6-promisify": "^6.0.0",
     "got": "^11.3.0",
     "html-entities": "^1.2.1",
-    "lodash": "^4.17.15",
+    "lodash": "^4.17.19",
     "moment": "^2.22.1",
     "puppeteer": "^4.0.0",
     "tough-cookie": "^4.0.0",
