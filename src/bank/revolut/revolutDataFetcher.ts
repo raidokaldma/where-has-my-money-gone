@@ -14,8 +14,7 @@ export class RevolutDataFetcher {
             username: this.config.get("bank.revolut.clientId"),
             password: this.config.get("bank.revolut.clientSecret"),
             headers: {
-                "User-Agent": "",
-                "X-Api-Version": "1",
+                "User-Agent": "Mozilla/5.0 github.com/raidokaldma/where-has-my-money-gone",
                 "X-Device-Id": this.config.get("bank.revolut.deviceId"),
             },
             responseType: "json",
