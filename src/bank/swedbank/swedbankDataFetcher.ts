@@ -19,19 +19,18 @@ export async function fetchTransactionsAndSummary(config: Config): Promise<{ sum
     }
 }
 
-async function logIn(page: Page, userId: string, socialSecurityId: string) {
-    await page.type("#userId", userId);
+async function logIn(page: Page, userId: string, identityNumber: string) {
+    await page.click("#loginbar ui-tabs li:nth-child(2) button"); // Biomeetria
 
-    await page.waitFor("#authPwd");
-    await page.type("#authPwd", socialSecurityId);
+    await page.type("#SIMPLE_ID input[name='userId']", userId);
 
-    await page.click("#pwdLoginButton");
+    await page.waitFor("#SIMPLE_ID input[name='identityNumber']");
+    await page.type("#SIMPLE_ID input[name='identityNumber']", identityNumber);
 
-    const challengeCodeElement = await page.waitFor(".login-challenge-code");
-    const code = await challengeCodeElement.evaluate((el) => el.innerText);
+    await page.click("#SIMPLE_ID button[type='submit']");
 
     // Wait until logged in
-    await withSpinner(page.waitForSelector("#account-details-container"), `Logging in with Smart-ID, code is ${code}`);
+    await withSpinner(page.waitForSelector("#account-details-container"), "Logging in with Face ID, check your phone");
 }
 
 async function fetchTransactions(page: Page): Promise<TransactionRow[]> {
