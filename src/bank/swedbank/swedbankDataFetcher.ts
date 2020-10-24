@@ -9,6 +9,7 @@ export async function fetchTransactionsAndSummary(config: Config): Promise<{ sum
     const browser = await launch();
     try {
         const page = await browser.newPage();
+        await page.setViewport({width: 1200, height: 800});
         await page.goto("https://www.swedbank.ee/private");
         await logIn(page, config.get("bank.swedbank.userId"), config.get("bank.swedbank.socialSecurityId"));
         const summary = await fetchAccountOverview(page);
