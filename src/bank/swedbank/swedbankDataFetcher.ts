@@ -11,6 +11,7 @@ export async function fetchTransactionsAndSummary(config: Config): Promise<{ sum
         const page = await browser.newPage();
         await page.setViewport({width: 1200, height: 800});
         await page.goto("https://www.swedbank.ee/private");
+        await page.click('button[data-wt-label="Accept all cookies"]'); // Hide huge cookie banner covering half of the page
         await logIn(page, config.get("bank.swedbank.userId"), config.get("bank.swedbank.socialSecurityId"));
         const summary = await fetchAccountOverview(page);
         const transactions = await fetchTransactions(page);
@@ -21,17 +22,13 @@ export async function fetchTransactionsAndSummary(config: Config): Promise<{ sum
 }
 
 async function logIn(page: Page, userId: string, identityNumber: string) {
-    await page.click("#loginbar ui-tabs li:nth-child(2) button"); // Biomeetria
-
+    await page.click("#SIMPLE_ID-control"); // Biomeetria
     await page.type("#SIMPLE_ID input[name='userId']", userId);
-
-    await page.waitFor("#SIMPLE_ID input[name='identityNumber']");
     await page.type("#SIMPLE_ID input[name='identityNumber']", identityNumber);
-
     await page.click("#SIMPLE_ID button[type='submit']");
 
     // Wait until logged in
-    await withSpinner(page.waitForSelector("#account-details-container"), "Logging in with Face ID, check your phone");
+    await withSpinner(page.waitForSelector("#last-login-container"), "Logging in with Face ID, check your phone");
 }
 
 async function fetchTransactions(page: Page): Promise<TransactionRow[]> {
