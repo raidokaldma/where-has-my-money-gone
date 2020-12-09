@@ -79,7 +79,7 @@ export class YnabApiExporter implements IBankDataExporter {
                 payee_name: name,
                 memo: description,
                 cleared: SaveTransaction.ClearedEnum.Cleared,
-                flag_color: SaveTransaction.FlagColorEnum.Orange,
+                flag_color: SaveTransaction.FlagColorEnum.Blue,
             };
             return ynabTransaction;
         });

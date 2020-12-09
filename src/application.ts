@@ -1,5 +1,5 @@
 import {DummyBank} from "./bank/dummy/bank";
-import {NordeaBank} from "./bank/nordea/bank";
+import {LuminorBank} from "./bank/luminor/bank";
 import {RevolutBank} from "./bank/revolut/bank";
 import {Swedbank} from "./bank/swedbank/bank";
 import {Config} from "./config";
@@ -8,7 +8,7 @@ import {YnabApiExporter} from "./export/ynabApiExporter";
 
 const config = new Config();
 const banks = new Map()
-    .set(NordeaBank.Name.toLowerCase(), new NordeaBank(config))
+    .set(LuminorBank.Name.toLowerCase(), new LuminorBank(config))
     .set(RevolutBank.Name.toLowerCase(), new RevolutBank(config))
     .set(Swedbank.Name.toLowerCase(), new Swedbank(config))
     .set(DummyBank.Name.toLowerCase(), new DummyBank());

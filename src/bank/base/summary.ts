@@ -1,5 +1,5 @@
 export class Summary {
-    constructor(private pendingAmount, private availableAmount) {
+    constructor(private pendingAmount: number, private availableAmount: number) {
     }
 
     public getPendingAmount(): number {

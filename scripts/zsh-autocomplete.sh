@@ -3,5 +3,5 @@
 
 script_file="$(realpath $(dirname $0)/../build/main-cli.js)"
 alias ynab="node $script_file"
-compdef 'compadd revolut nordea swedbank' ynab
+compdef 'compadd revolut luminor swedbank' ynab
 setopt complete_aliases

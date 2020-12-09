@@ -6,10 +6,10 @@
       "clientId": "",
       "deviceId": ""
     },
-    "nordea": {
+    "luminor": {
       "userId": "0000000",
-      "accountIdForCsv": 0,
-      "accountName": ""
+      "socialSecurityId": "00000000000",
+      "iban": ""
     },
     "swedbank": {
       "userId": "EE000000",
@@ -18,14 +18,11 @@
   },
   "exporter": {
     "ynab": {
-      "csv": {
-        "outDirectory": ""
-      },
       "api": {
         "key": "",
         "budgetId": "",
         "account": {
-          "nordea": "",
+          "luminor": "",
           "revolut": "",
           "swedbank": ""
         }
