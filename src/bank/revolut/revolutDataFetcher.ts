@@ -1,7 +1,6 @@
 import got, {Got} from "got";
 import * as moment from "moment";
 import {withSpinner} from "../../common/promise-spinner";
-import {readUserInput} from "../../common/read-user-input";
 import {Config} from "../../config";
 import {ITransaction, IWallet} from "./responseTypes";
 import {RevolutTransactionData} from "./revolutTransactionData";
@@ -12,15 +11,17 @@ export class RevolutDataFetcher {
     constructor(private config: Config) {
         this.got = got.extend({
             headers: {
-                "User-Agent": "Mozilla/5.0 github.com/raidokaldma/where-has-my-money-gone",
-                "X-Device-Id": this.config.get("bank.revolut.deviceId"),
+                "user-agent": "github.com/raidokaldma/where-has-my-money-gone Chrome/87.0.4280.101",
+                "x-device-id": this.config.get("bank.revolut.deviceId"),
+                "x-browser-application": "WEB_CLIENT",
+                "x-client-version": "100.0",
             },
             responseType: "json",
         });
     }
 
     public async fetch(): Promise<RevolutTransactionData> {
-        const token = await this.acquireToken();
+        const token = await withSpinner(this.acquireToken(), "Logging in, check your phone");
 
         const fromDate = moment().subtract(1, "month").toDate();
 
@@ -44,19 +45,24 @@ export class RevolutDataFetcher {
     }
 
     private async acquireToken() {
-        await this.got.post("https://app.revolut.com/api/retail/auth", {
+        const {tokenId} = await this.got.post("https://app.revolut.com/api/retail/signin", {
             json: {
                 phone: this.config.get("bank.revolut.phoneNumber"),
+                password: this.config.get("bank.revolut.password"),
+                channel: "APP",
             },
         }).json();
 
-        const confirmationCode = await readUserInput("Enter confirmation code from email: ");
-
-        const {accessToken} = await this.got.post("https://app.revolut.com/api/retail/auth/signin", {
+        const {accessToken} = await this.got.post("https://app.revolut.com/api/retail/token", {
+            retry: {
+                methods: ["POST"],
+                statusCodes: [422],
+                limit: 30,
+            },
             json: {
-                phone: this.config.get("bank.revolut.phoneNumber"),
-                code: confirmationCode,
+                tokenId,
                 password: this.config.get("bank.revolut.password"),
+                phone: this.config.get("bank.revolut.phoneNumber"),
             },
         }).json();
 
