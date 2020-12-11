@@ -21,22 +21,22 @@ export class RevolutDataFetcher {
     }
 
     public async fetch(): Promise<RevolutTransactionData> {
-        const token = await withSpinner(this.acquireToken(), "Logging in, check your phone");
+        const {accessToken, userId} = await withSpinner(this.acquireToken(), "Logging in, check your phone");
 
         const fromDate = moment().subtract(1, "month").toDate();
 
         const transactionsResponse = await withSpinner(
             this.got.get(`https://api.revolut.com/user/current/transactions?count=500&from=${fromDate.valueOf()}`, {
-                username: this.config.get("bank.revolut.clientId"),
-                password: token,
+                username: userId,
+                password: accessToken,
             }).json<ITransaction[]>(),
             "Fetching transactions",
         );
 
         const walletResponse = await withSpinner(
             this.got.get(`https://api.revolut.com/user/current/wallet`, {
-                username: this.config.get("bank.revolut.clientId"),
-                password: token,
+                username: userId,
+                password: accessToken,
             }).json<IWallet>(),
             "Fetching balance",
         );
@@ -53,7 +53,7 @@ export class RevolutDataFetcher {
             },
         }).json();
 
-        const {accessToken} = await this.got.post("https://app.revolut.com/api/retail/token", {
+        const {accessToken, user} = await this.got.post("https://app.revolut.com/api/retail/token", {
             retry: {
                 methods: ["POST"],
                 statusCodes: [422],
@@ -66,6 +66,6 @@ export class RevolutDataFetcher {
             },
         }).json();
 
-        return accessToken;
+        return {accessToken, userId: user.id};
     }
 }
