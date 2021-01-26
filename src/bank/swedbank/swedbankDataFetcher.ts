@@ -11,7 +11,7 @@ export async function fetchTransactionsAndSummary(config: Config): Promise<{ sum
         const page = await browser.newPage();
         await page.setViewport({width: 1200, height: 800});
         await page.goto("https://www.swedbank.ee/private");
-        await page.click('button[data-wt-label="Accept all cookies"]'); // Hide huge cookie banner covering half of the page
+        await acceptCookies(page);
         await logIn(page, config.get("bank.swedbank.userId"), config.get("bank.swedbank.socialSecurityId"));
         const summary = await fetchAccountOverview(page);
         const transactions = await fetchTransactions(page);
@@ -19,6 +19,11 @@ export async function fetchTransactionsAndSummary(config: Config): Promise<{ sum
     } finally {
         await browser.close();
     }
+}
+
+async function acceptCookies(page: Page) {
+    await page.click("#cookie-consent .ui-cookie-consent__accept-all-button");
+    await page.waitForSelector("#cookie-consent .ui-modal__window", {hidden: true}); // Wait for modal to disappear
 }
 
 async function logIn(page: Page, userId: string, identityNumber: string) {
