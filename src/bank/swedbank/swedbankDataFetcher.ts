@@ -48,10 +48,14 @@ async function fetchTransactions(page: Page): Promise<TransactionRow[]> {
     const rows: TableRowData[] = await page.$$eval<TableRowData[]>("#tblStatement tbody tr", (tableRows) => {
         return tableRows.filter((tr) => tr.id.startsWith("t_0")).map((tr) => {
             const tdElements = tr.querySelectorAll("td");
+
+            // 516737******4723 01.04.21 APPLE.COM/BILL ITUNES.COM -> 01.04.21 APPLE.COM/BILL ITUNES.COM
+            const description = tdElements[3].innerText.replace(/^\d{6}\*+\d{4}\s+/, '');
+
             return {
                 date: tdElements[1].innerText,
                 payerOrPayee: tdElements[2].innerText,
-                description: tdElements[3].innerText,
+                description: description,
                 amount: tdElements[4].innerText,
             };
         });
