@@ -26,7 +26,7 @@
     "moment": "^2.22.1",
     "puppeteer": "^9.0.0",
     "tough-cookie": "^4.0.0",
-    "ynab": "^0.15.0"
+    "ynab": "^1.24.0"
   },
   "devDependencies": {
     "@types/cheerio": "^0.22.7",
