@@ -39,10 +39,10 @@ async function logIn(page: Page, userId: string, identityNumber: string) {
 async function fetchTransactions(page: Page): Promise<TransactionRow[]> {
     await page.click('a[data-wt-label="QL_Account_statement"]');
 
-    await withSpinner(page.waitFor("#account-statement-form"), "Opening account statement page");
+    await withSpinner(page.waitForSelector("#account-statement-form"), "Opening account statement page");
     await page.click(".period-list li:last-of-type a"); // Pick last predefined filter: Last month + current month
 
-    await withSpinner(page.waitFor("#tblStatement"), "Changed filter, loading account statement");
+    await withSpinner(page.waitForSelector("#tblStatement"), "Changed filter, loading account statement");
 
     type TableRowData = { date: string, payerOrPayee: string, description: string, amount: string };
     const rows: TableRowData[] = await page.$$eval<TableRowData[]>("#tblStatement tbody tr", (tableRows) => {
@@ -70,7 +70,7 @@ async function fetchTransactions(page: Page): Promise<TransactionRow[]> {
 }
 
 async function fetchAccountOverview(page: Page): Promise<Summary> {
-    await page.waitFor("#accounts-balance tbody tr");
+    await page.waitForSelector("#accounts-balance tbody tr");
 
     const {bookedAmount, availableAmount} = await page.$eval("#accounts-balance tbody tr", (firstTr) => {
         const bookedAmount: string = firstTr.querySelector('td[data-th="Broneeritud"]').innerText;
